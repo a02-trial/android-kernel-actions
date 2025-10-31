@@ -1,4 +1,4 @@
-name: "Build Susujahe kernel on a02."                 # Description of the workflow.
+name: "Build Kernel."                                 # Description of the workflow.
 on:
   push:
     branches: a02                                     # Branch to build.
