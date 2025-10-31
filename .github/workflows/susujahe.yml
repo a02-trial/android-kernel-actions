@@ -18,7 +18,7 @@ jobs:
     - name: "Android kernel build"                    # Build kernel with a02-trial/android-kernel-actions.
       uses: a02-trial/android-kernel-actions@master
       with:
-        arch: arm64                                   # Specify arch
-        compiler: gcc/11                              # Specify toolchain to use
+        arch: arm                                     # Specify arch
+        compiler: clang/11                            # Specify toolchain to use
         defconfig: a02_defconfig                      # Specify defconfig to use
         image: Image.gz-dtb                           # Specify final build file
