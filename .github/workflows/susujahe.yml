@@ -1,0 +1,24 @@
+name: "Build Susujahe kernel on a02."                 # Description of the workflow.
+on:
+  push:
+    branches: a02                                     # Branch to build.
+  workflow_dispatch:                                  # Allow to manually trigger workflow.
+jobs:
+  build:
+    name: "Build Susujahe kernel"
+    runs-on: ubuntu-latest
+    steps:
+    - name: "Checkout kernel source"                  # Clone the kernel source.
+      uses: actions/checkout@v2
+    - name: "Checkout zipper"                         # (OPTIONAL) Clone the AnyKernel3 template.
+      uses: actions/checkout@v2
+      with:
+        repository: a02-trial/AnyKernel3              # Your own AnyKernel3 repository.
+        path: zipper                                  # Clone to path "zipper", REQUIRED.
+    - name: "Android kernel build"                    # Build kernel with a02-trial/android-kernel-actions.
+      uses: a02-trial/android-kernel-actions@master
+      with:
+        arch: arm                                     # Specify arch
+        compiler: gcc/11                              # Specify toolchain to use
+        defconfig: a02_defconfig                      # Specify defconfig to use
+        image: Image.gz-dtb                           # Specify final build file
