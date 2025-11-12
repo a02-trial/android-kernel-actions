@@ -41,7 +41,7 @@ apt install -y --no-install-recommends git make bc bison openssl \
 ln -sf "/usr/bin/python${python_version}" /usr/bin/python
 set_output hash "$(cd "$kernel_path" && git rev-parse HEAD || exit 127)"
 msg "Installing toolchain..."
-if [[ $arch = "arm64" ]]; then
+if [[ $arch = "arm" ]]; then
     arch_opts="ARCH=${arch} SUBARCH=${arch}"
     export ARCH="$arch"
     export SUBARCH="$arch"
@@ -59,10 +59,10 @@ if [[ $arch = "arm64" ]]; then
 
         ln -sf /usr/bin/gcc-"$ver_number" /usr/bin/gcc
         ln -sf /usr/bin/g++-"$ver_number" /usr/bin/g++
-        ln -sf /usr/bin/aarch64-linux-gnu-gcc-"$ver_number" /usr/bin/aarch64-linux-gnu-gcc
+        ln -sf /usr/bin/arm-linux-gnu-gcc-"$ver_number" /usr/bin/arm-linux-gnu-gcc
         ln -sf /usr/bin/arm-linux-gnueabi-gcc-"$ver_number" /usr/bin/arm-linux-gnueabi-gcc
 
-        export CROSS_COMPILE="aarch64-linux-gnu-"
+        export CROSS_COMPILE="arm4-linux-gnu-"
         export CROSS_COMPILE_ARM32="arm-linux-gnueabi-"
     elif [[ $compiler = clang/* ]]; then
         ver="${compiler/clang\/}"
@@ -70,13 +70,13 @@ if [[ $arch = "arm64" ]]; then
         binutils="$([[ $ver = */binutils ]] && echo true || echo false)"
         
         if $binutils; then
-            additional_packages="binutils binutils-aarch64-linux-gnu binutils-arm-linux-gnueabi"
+            additional_packages="binutils binutils-arm-linux-gnu binutils-arm-linux-gnueabi"
             make_opts="CC=clang"
             host_make_opts="HOSTCC=clang HOSTCXX=clang++"
         else
             # Most android kernels still need binutils as the assembler, but it will
             # not be used when the Makefile is patched to make use of LLVM_IAS option
-            additional_packages="binutils-aarch64-linux-gnu binutils-arm-linux-gnueabi"
+            additional_packages="binutils-arm-linux-gnu binutils-arm-linux-gnueabi"
             make_opts="CC=clang LD=ld.lld NM=llvm-nm AR=llvm-ar STRIP=llvm-strip OBJCOPY=llvm-objcopy"
             make_opts+=" OBJDUMP=llvm-objdump READELF=llvm-readelf LLVM_IAS=1"
             host_make_opts="HOSTCC=clang HOSTCXX=clang++ HOSTLD=ld.lld HOSTAR=llvm-ar"
@@ -96,8 +96,8 @@ if [[ $arch = "arm64" ]]; then
             ln -sf "$i" "${i/-$ver_number}"
         done
 
-        export CLANG_TRIPLE="aarch64-linux-gnu-"
-        export CROSS_COMPILE="aarch64-linux-gnu-"
+        export CLANG_TRIPLE="arm-linux-gnu-"
+        export CROSS_COMPILE="arm-linux-gnu-"
         export CROSS_COMPILE_ARM32="arm-linux-gnueabi-"
     elif [[ $compiler = proton-clang/* ]]; then
         ver="${compiler/proton-clang\/}"
@@ -129,8 +129,8 @@ if [[ $arch = "arm64" ]]; then
         cd "$workdir"/"$kernel_path" || exit 127
 
         export PATH="$proton_path/bin:${PATH}"
-        export CLANG_TRIPLE="aarch64-linux-gnu-"
-        export CROSS_COMPILE="aarch64-linux-gnu-"
+        export CLANG_TRIPLE="arm-linux-gnu-"
+        export CROSS_COMPILE="arm-linux-gnu-"
         export CROSS_COMPILE_ARM32="arm-linux-gnueabi-"
     elif [[ $compiler = aosp-clang/* ]]; then
         ver="${compiler/aosp-clang\/}"
@@ -143,28 +143,21 @@ if [[ $arch = "arm64" ]]; then
             err "Failed downloading toolchain, refer to the README for details"
             exit 1
         fi
-        url="https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/+archive/refs/heads/android12L-release.tar.gz"
-        echo "Downloading $url"
-        if ! wget --no-check-certificate "$url" -O /tmp/aosp-gcc-arm64.tar.gz &>/dev/null; then
-            err "Failed downloading toolchain, refer to the README for details"
-            exit 1
-        fi
         url="https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9/+archive/refs/heads/android12L-release.tar.gz"
         echo "Downloading $url"
         if ! wget --no-check-certificate "$url" -O /tmp/aosp-gcc-arm.tar.gz &>/dev/null; then
             err "Failed downloading toolchain, refer to the README for details"
             exit 1
         fi
-        url="https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/host/x86_64-linux-glibc2.17-4.8/+archive/refs/heads/android12L-release.tar.gz"
+        url="https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/host/x86_64-linux-glibc2.17-4.8/+archive/refs/tags/android-11.0.0_r48.tar.gz"
         echo "Downloading $url"
         if ! wget --no-check-certificate "$url" -O /tmp/aosp-gcc-host.tar.gz &>/dev/null; then
             err "Failed downloading toolchain, refer to the README for details"
             exit 1
         fi
 
-        mkdir -p /aosp-clang /aosp-gcc-arm64 /aosp-gcc-arm /aosp-gcc-host
+        mkdir -p /aosp-clang /aosp-gcc-arm /aosp-gcc-host
         extract_tarball /tmp/aosp-clang.tar.gz /aosp-clang
-        extract_tarball /tmp/aosp-gcc-arm64.tar.gz /aosp-gcc-arm64
         extract_tarball /tmp/aosp-gcc-arm.tar.gz /aosp-gcc-arm
         extract_tarball /tmp/aosp-gcc-host.tar.gz /aosp-gcc-host
 
@@ -183,7 +176,7 @@ if [[ $arch = "arm64" ]]; then
 
         apt install -y --no-install-recommends libgcc-10-dev || exit 127
 
-        export PATH="/aosp-clang/bin:/aosp-gcc-arm64/bin:/aosp-gcc-arm/bin:/aosp-gcc-host/bin:$PATH"
+        export PATH="/aosp-clang/bin:/aosp-gcc-arm/bin:/aosp-gcc-host/bin:$PATH"
         export CLANG_TRIPLE="aarch64-linux-gnu-"
         export CROSS_COMPILE="aarch64-linux-android-"
         export CROSS_COMPILE_ARM32="arm-linux-androideabi-"
