@@ -5,16 +5,16 @@ branding:
   icon: box
   color: green
 inputs:
-  arch:
+  arch: arm
     description: Device architecture
     required: true
-  compiler:
+  compiler: arm-linux-androideabi-
     description: Compiler to use
     required: true
-  defconfig:
+  defconfig: a02_defconfig
     description: Defconfig to use
     required: true
-  image:
+  image: Image
     description: Kernel image name
     required: true
 outputs:
