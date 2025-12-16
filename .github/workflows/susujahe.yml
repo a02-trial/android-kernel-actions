@@ -15,10 +15,20 @@ jobs:
       with:
         repository: a02-trial/AnyKernel3              # Your own AnyKernel3 repository.
         path: zipper                                  # Clone to path "zipper", REQUIRED.
-    - name: "Android kernel build"                    # Build kernel with a02-trial/android-kernel-actions.
-      uses: a02-trial/android-kernel-actions@master
+    
+    - name: Android kernel build
+      uses: lemniskett/android-kernel-actions@master
+      id: build
+      env:
+        NAME: RooXie
       with:
-        arch: arm                                     # Specify arch
-        compiler: clang/11                            # Specify toolchain to use
-        defconfig: a02_defconfig                      # Specify defconfig to use
-        image: zImage                                 # Specify final build file
+        arch: arm
+        compiler: gcc/10
+        defconfig: a02_defconfig
+        image: zImage
+
+    - name: Release build
+      uses: ncipollo/release-action@main
+      with:
+        artifacts: ${{ steps.build.outputs.outfile }}
+        token: ${{ secrets.GITHUB_TOKEN }}
