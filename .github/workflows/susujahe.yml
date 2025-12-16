@@ -1,11 +1,11 @@
 name: "Build Kernel."                                 # Description of the workflow.
 on:
   push:
-    branches: a02                                     # Branch to build.
+    branches: master                                  # Branch to build.
   workflow_dispatch:                                  # Allow to manually trigger workflow.
 jobs:
   build:
-    name: "Build Susujahe kernel"
+    name: "Build kernel"
     runs-on: ubuntu-latest
     steps:
     - name: "Checkout kernel source"                  # Clone the kernel source.
@@ -21,4 +21,4 @@ jobs:
         arch: arm                                     # Specify arch
         compiler: clang/11                            # Specify toolchain to use
         defconfig: a02_defconfig                      # Specify defconfig to use
-        image: Image.gz-dtb                           # Specify final build file
+        image: zImage                                 # Specify final build file
